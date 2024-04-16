@@ -1,5 +1,6 @@
 const { response } = require('express');
 const Medico = require("../models/medico");
+const Hospital = require("../models/hospital");
 
 const getMedicos = async ( req, res = response ) =>{
 
@@ -39,20 +40,74 @@ const createMedico = async( req, res = response ) =>{
     }
 }
 
-const updateMedico = ( req, res = response ) =>{
+const updateMedico = async ( req, res = response ) =>{
 
-    res.json({
-        ok: true,
-        msg: 'updateMedico'
-    })
+    const id = req.params.id;
+    const uid = req.uid;
+
+    try {
+
+        const medico = await Medico.findById( id );
+
+        if( !medico ) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Medico no encontrado por id '
+            })
+        }
+
+        const cambiosMedico = {
+            ...req.body,
+            usuario: uid
+        }
+
+        const updatedMedico = await Medico.findByIdAndUpdate( id, cambiosMedico, {new: true});
+
+        medico.nombre = req.body.nombre;
+
+        res.json({
+            ok: true,
+            medico: updatedMedico
+        });
+
+    } catch ( error ) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Hable con el administrador'
+        })
+    }
+
+
 }
 
-const deleteMedico = ( req, res = response ) =>{
+const deleteMedico = async ( req, res = response ) =>{
 
-    res.json({
-        ok: true,
-        msg: 'deleteMedico'
-    })
+    const id = req.params.id;
+
+    try {
+
+        const medico = await Medico.findById( id );
+
+        if( !medico ) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Medico no encontrado por id '
+            })
+        }
+
+        await Medico.findByIdAndDelete( id );
+
+        res.json({
+            ok: true,
+            msg: 'Medico eliminado'
+        });
+
+    } catch ( error ) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Hable con el administrador'
+        })
+    }
 }
 
 module.exports = {
