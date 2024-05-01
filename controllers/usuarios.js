@@ -107,7 +107,7 @@ const putUsuario = async  ( req, res = response ) => {
         } else if ( usuarioDb.email !== email ){
             return res.status( 400 ).json({
                 ok: false,
-                msg: 'Usuarios de google no pueden cambiar su correo'
+                msg: 'Usuarios de google no pueden cambiar su corre'
             });
         }
 
